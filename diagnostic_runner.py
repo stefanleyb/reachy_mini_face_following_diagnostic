@@ -2,7 +2,9 @@
 """Stationary-face fixed-body daemon baseline — interactive diagnostic runner.
 
 One local program, launched once, that walks an operator through the six
-stationary-face trials from the preserved face/body workstream history (seated/standing ×
+stationary-face trials from
+``../../coordination/archive/face_following_full_history.md``
+(seated/standing ×
 center/left/right) and records the daemon head-tracking data to automatic
 timestamped files. Per trial the only interaction is: read the spot, press
 Enter, walk there during a countdown, hold still for a ~15 s recorded window.
@@ -33,6 +35,26 @@ import time
 from typing import Any, Optional
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+def _default_results_dir(env_var: str, area: str) -> str:
+    """Where sessions are written when no ``--results-dir`` is given.
+
+    The umbrella workspace keeps generated evidence in ``runs/`` beside the tool
+    repositories rather than inside them. Prefer that when this checkout sits in
+    the workspace, so a direct ``python diagnostic_runner.py`` invocation
+    lands in the same place as the ``./run`` launcher; fall back to a
+    tool-local ``results/`` for a standalone checkout. An explicit environment
+    variable always wins.
+    """
+    override = os.environ.get(env_var)
+    if override:
+        return override
+    workspace_runs = os.path.normpath(
+        os.path.join(THIS_DIR, os.pardir, os.pardir, "runs", area)
+    )
+    if os.path.isdir(workspace_runs):
+        return os.path.join(workspace_runs, "results")
+    return os.path.join(THIS_DIR, "results")
+
 if THIS_DIR not in sys.path:
     sys.path.insert(0, THIS_DIR)
 
@@ -415,7 +437,7 @@ def parse_args(argv: Optional[list[str]] = None) -> RunConfig:
     p.add_argument("--no-bell", action="store_true", help="disable terminal bell cue")
     p.add_argument(
         "--results-dir",
-        default=os.environ.get("REACHY_FACE_RESULTS_DIR", os.path.join(THIS_DIR, "results")),
+        default=_default_results_dir("REACHY_FACE_RESULTS_DIR", "face_following"),
     )
     p.add_argument("--only", type=str, default=None, help="comma list of 1-based trial numbers, e.g. 2,3")
     p.add_argument("--dry-run", action="store_true", help="rehearse with a fake client, no daemon/robot")
@@ -615,7 +637,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     print(f"           {os.path.join(session.dir, 'summary.json')}")
     print()
     print("  Next: capture the external observer video filename(s) alongside this")
-    print("  directory, then analyse per the face/body workstream brief.")
+    print("  directory, then analyse per")
+    print("  coordination/workstreams/face-and-body/BRIEF.md.")
     return 0 if not aborted else 130
 
 

@@ -156,7 +156,8 @@ class SessionRecorder:
             "(head pose 4x4 + joints, face target, ft_debug when instrumented, "
             "plus `derived` euler angles). `<label>.json` has timing + meta.",
             "",
-            "Analyse per `face_following.md`: first-move overshoot, oscillation "
+            "Analyse per coordination/workstreams/face-and-body/"
+            "BRIEF.md: first-move overshoot, oscillation "
             "amplitude/frequency, settle time, face-loss behaviour.",
             "",
         ]

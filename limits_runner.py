@@ -11,7 +11,8 @@ presses Enter at a felt limit. Eight marks, fixed alternating order (see
 
 The deliverable is the recorded head-yaw-relative-to-body at each press plus the
 continuous 50 Hz stream for the whole session. It does **not** choose dwell /
-rate / hysteresis and it never commands the body — see the face/body workstream brief.
+rate / hysteresis and it never commands the body — see
+``../../coordination/workstreams/face-and-body/BRIEF.md``.
 
 Scope guard: the runner wakes the robot, centres the head, and enables face
 tracking, so an operator must be watching it. ``--dry-run`` rehearses with a fake
@@ -32,6 +33,26 @@ from dataclasses import asdict, dataclass
 from typing import Any, Optional
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+def _default_results_dir(env_var: str, area: str) -> str:
+    """Where sessions are written when no ``--results-dir`` is given.
+
+    The umbrella workspace keeps generated evidence in ``runs/`` beside the tool
+    repositories rather than inside them. Prefer that when this checkout sits in
+    the workspace, so a direct ``python limits_runner.py`` invocation lands
+    in the same place as the ``./run`` launcher; fall back to a tool-local
+    ``results/`` for a standalone checkout. An explicit environment variable
+    always wins.
+    """
+    override = os.environ.get(env_var)
+    if override:
+        return override
+    workspace_runs = os.path.normpath(
+        os.path.join(THIS_DIR, os.pardir, os.pardir, "runs", area)
+    )
+    if os.path.isdir(workspace_runs):
+        return os.path.join(workspace_runs, "results")
+    return os.path.join(THIS_DIR, "results")
+
 if THIS_DIR not in sys.path:
     sys.path.insert(0, THIS_DIR)
 
@@ -91,7 +112,7 @@ def parse_args(argv: Optional[list[str]] = None) -> tuple[LimitsConfig, str, boo
     p.add_argument("--bell", action="store_true", help="terminal bell on each prompt")
     p.add_argument(
         "--results-dir",
-        default=os.environ.get("REACHY_FACE_RESULTS_DIR", os.path.join(THIS_DIR, "results")),
+        default=_default_results_dir("REACHY_FACE_RESULTS_DIR", "face_following"),
     )
     p.add_argument("--dry-run", action="store_true",
                    help="rehearse with a fake client, no daemon/robot")
