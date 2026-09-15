@@ -98,7 +98,7 @@ ssh pollen@reachy-mini.local
   sudo systemctl stop reachy-mini-daemon
   REACHY_FT_DEBUG=1 PYTHONPATH=~/ft_debug \
     /venvs/mini_daemon/lib/python3.12/site-packages/reachy_mini/daemon/app/services/wireless/launcher.sh
-  # ... run ./run --host reachy-mini.local from your Mac ...
+  # ... run ./run --host reachy-mini.local from your computer ...
   # Ctrl-C, then:
   sudo systemctl start reachy-mini-daemon
 ```
