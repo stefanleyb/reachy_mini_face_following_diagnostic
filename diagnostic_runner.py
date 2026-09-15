@@ -3,7 +3,7 @@
 
 One local program, launched once, that walks an operator through the six
 stationary-face trials from
-``../../coordination/archive/face_following_full_history.md``
+the project workstream history
 (seated/standing ×
 center/left/right) and records the daemon head-tracking data to automatic
 timestamped files. Per trial the only interaction is: read the spot, press
@@ -637,8 +637,7 @@ def main(argv: Optional[list[str]] = None) -> int:
     print(f"           {os.path.join(session.dir, 'summary.json')}")
     print()
     print("  Next: capture the external observer video filename(s) alongside this")
-    print("  directory, then analyse per")
-    print("  coordination/workstreams/face-and-body/BRIEF.md.")
+    print("  directory, then analyse the recorded head-yaw stream.")
     return 0 if not aborted else 130
 
 

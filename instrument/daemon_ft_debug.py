@@ -43,7 +43,7 @@ disk was modified. ``remove()`` is also provided for tests / long-lived procs.
 
 This is deliberately a throwaway measurement aid. The durable version of this
 data path belongs in a separate upstream ``reachy_mini`` checkout as a real
-protocol message (see ``../../../coordination/archive/face_following_full_history.md``).
+protocol message (see the project workstream history).
 """
 
 from __future__ import annotations

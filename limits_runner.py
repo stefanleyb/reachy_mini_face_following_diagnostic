@@ -12,7 +12,7 @@ presses Enter at a felt limit. Eight marks, fixed alternating order (see
 The deliverable is the recorded head-yaw-relative-to-body at each press plus the
 continuous 50 Hz stream for the whole session. It does **not** choose dwell /
 rate / hysteresis and it never commands the body — see
-``../../coordination/workstreams/face-and-body/BRIEF.md``.
+the project workstream brief.
 
 Scope guard: the runner wakes the robot, centres the head, and enables face
 tracking, so an operator must be watching it. ``--dry-run`` rehearses with a fake

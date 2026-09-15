@@ -1,7 +1,7 @@
 # Daemon face-tracking debug instrumentation
 
 Minimum instrumentation needed to record the data in
-`../../../coordination/archive/face_following_full_history.md`
+the project workstream history
 in the fixed-body baseline. Applied in-process; **no file under `site-packages`
 is modified.**
 
@@ -130,4 +130,4 @@ long-lived process (used by the tests).
 This is a throwaway measurement aid. The durable version is a real protocol
 message added in a separate upstream `reachy_mini` checkout — see the
 "candidate daemon changes" and contribution path in
-`../../../coordination/archive/face_following_full_history.md`.
+the project workstream history.

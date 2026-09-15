@@ -21,7 +21,7 @@ whole session so the marks can be re-analysed offline.
 
 This is a measurement aid, not a product app or a calibration UI. It does not
 choose dwell / rate / hysteresis -- those stay later behaviour-test outputs
-(see ``../../../coordination/archive/face_following_full_history.md``).
+(see the project workstream history).
 """
 
 from __future__ import annotations
@@ -593,7 +593,7 @@ class LimitsRecorder:
               "readings above are the real output: if one side consistently feels "
               "earlier, keep that difference — do not average it away for symmetry. "
               "Dwell, immediate-turn timing, body rate and hysteresis are still later "
-              "behaviour tests (coordination/workstreams/face-and-body/BRIEF.md).", ""]
+              "behaviour tests.", ""]
         for kind in KINDS:
             p = rollup["suggestion"][kind]
             if p["suggested_symmetric_deg"] is None:

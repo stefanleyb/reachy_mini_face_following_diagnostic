@@ -9,8 +9,7 @@ from typing import Callable, Optional
 
 import numpy as np
 
-# The six stationary-face trials, in run order. See
-# ../../../coordination/archive/face_following_full_history.md.
+# The six stationary-face trials, in run order.
 TRIALS: list[dict[str, str]] = [
     {"height": "seated", "position": "center"},
     {"height": "seated", "position": "left"},

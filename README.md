@@ -1,60 +1,114 @@
-# Fixed-body stationary-face diagnostic runner
+# Reachy Mini Face-Following Diagnostic
 
-One local, interactive program that runs the preserved six stationary-face
-trials from
-[`../../coordination/archive/face_following_full_history.md`](../../coordination/archive/face_following_full_history.md)
-in a single session and records
-the daemon head-tracking data to automatic timestamped files. **The movement
-data is the deliverable — there are no observer questions during the run.**
+Measures how well your Reachy Mini's head tracks a face that is standing still.
 
-This is a **measurement aid**, not a product. It does not tune the tracker, does
-not drive body-following, and does not touch the TV. It is not a Hugging Face
-app.
+## Why you might want this
 
-## Wake / neutral / sleep
+The robot's head follows faces. Whether it does so *well* — settling cleanly,
+or drifting and hunting around the target — is hard to judge by eye. This runs a
+fixed set of trials, records what the head actually did at 50 Hz, and writes the
+numbers to a file you can compare against a later run.
 
-The robot boots with its head folded inside the body and motors off. At the
-start of a session the runner performs the mandatory wake sequence
-(`AGENTS.md`): enable motors -> verify enabled -> standard daemon `wake_up`
-motion (unfold) -> operator physically confirms the head is clear. Every
-centring afterwards targets the **exact same** daemon-defined neutral pose
-(`INIT_HEAD_POSE` + `INIT_ANTENNAS_JOINT_POSITIONS`, body yaw 0), so "neutral"
-never drifts between trials. At the end (or on Ctrl-C) it runs `goto_sleep` and
-disables motors so the robot is left folded and safe.
+It is a measuring instrument. It changes nothing about how your robot behaves.
 
-## What each trial looks like (one keypress)
+## What it asks of you
 
+A person to stand in six positions — seated and standing, each at centre, left
+and right — holding still for about 15 seconds per trial while the robot watches.
+The program tells you where to stand, counts you down, then records. There are no
+questions to answer during a run; the movement data is the output.
+
+Budget about 10 minutes and a helper, or use yourself and a mirror.
+
+## Before you start
+
+- A Reachy Mini reachable at `reachy-mini.local`.
+- Python 3.12+ with `numpy`, `scipy`, `requests`, `websockets` and `reachy_mini`.
+- Room to stand roughly 1–2 m from the robot, left, centre and right.
+
+⚠️ **This moves the robot.** It wakes the robot, centres the head and turns on
+face tracking, so someone must be watching it throughout.
+
+## Step by step
+
+**1. Rehearse with no robot at all**, to see the flow:
+
+```bash
+./run --dry-run
 ```
-=== Trial 3 of 6 — SEATED / RIGHT ===
-  Sit off to the robot's right ... hold still, face toward the robot.
-  Press Enter to start the countdown…            <- you press Enter
-                                                 <- head centres silently
-  walk to position (seated, right) ... 10  9  8 ...   <- 10 s to get there
-  ▶ START   [tracking on, ~15 s recorded]
-  ■ END     [tracking off, head returns to neutral]
-  saved 740 rows · 128 face-target frames
+
+**2. Check the connection without moving anything:**
+
+```bash
+./run --preflight
 ```
 
-No distance, no marks, no verdict. The runner names the spot, you get there
-during the countdown, then hold still. Defaults: 10 s countdown, 15 s window
-(`--countdown`, `--window` to change). Automated per-trial check: motors still
-enabled + head still at neutral; it only asks you anything if that fails.
+**3. Run it for real:**
 
-After the six trials it offers one optional empty-scene control (step out of
-view). At the end (or Ctrl-C) it sleeps the robot and disables motors.
+```bash
+./run
+```
 
-Run `./run --preflight --host <robot>` first: connects, reports
-daemon/camera/motor status and measured stream rates, exits **without moving
-the robot**.
+Follow the prompts: read where to stand, press Enter, walk there during the
+countdown, hold still while it records. Repeat for each of the six trials.
 
-## Wake / neutral / sleep
+**4. Find your results** in a timestamped folder, one per session. Each holds
+the per-trial recordings plus a summary.
 
-The robot boots with its head folded inside the body and motors off. At session
-start the runner does the mandatory wake (`AGENTS.md`): enable motors -> verify
--> standard daemon `wake_up` unfold -> **one** physical confirmation from you
-that the head is clear. Every centring afterwards targets the identical
-daemon-defined neutral pose (`INIT_HEAD_POSE` + `INIT_ANTENNAS`, yaw 0), so
-neutral never drifts.
+To measure how far the head can turn before the body must help, there is a
+second, separate session:
+
+```bash
+./run_limits --dry-run     # rehearse first
+./run_limits
+```
+
+## Safety
+
+Before anything moves, the robot must be properly awake with its head clear of
+the body. The runner checks the motors report `enabled` and will refuse to
+proceed otherwise. Never start with the head still folded inside the body.
+
+## If something goes wrong
+
+- **"no python found"** — the launcher looks for a virtual environment beside or
+  above this folder. Point it at yours with `DIAG_PYTHON=/path/to/python ./run`.
+- **The robot isn't found** — try `./run --host <ip-address>` if mDNS
+  (`reachy-mini.local`) is unreliable on your network.
+- **A trial goes wrong** — stop with Ctrl-C. Completed trials are already
+  written to disk; nothing is lost.
+
+## For the technically curious
+
+Six stationary-face trials (seated/standing × centre/left/right), each a ~15 s
+recorded window at 50 Hz, with an optional empty-room control. The deliverable is
+the head-yaw-relative-to-body stream plus per-trial metadata, timing and a
+verdict, written as JSON so runs can be compared directly.
+
+The separate limits session records head yaw relative to body at each operator
+keypress, to establish where the head's comfortable range ends. It never commands
+the body.
+
+Some measurements need extra visibility into the daemon's internals, which is
+supplied by a temporary instrumentation layer — see `instrument/`.
+
+## Running the tests
+
+No robot required:
+
+```bash
+for t in tests/test_*.py; do python "$t"; done
+```
+
+## Status and licence
+
+Built against **daemon/SDK 1.10.0** on a Reachy Mini Wireless. A personal
+project's working tooling, not an officially supported product. Not affiliated
+with Pollen Robotics.
+
+---
+
+# Technical reference
 
 ## Output
 
@@ -137,7 +191,7 @@ Run with `../../.venv/bin/python` so `reachy_mini` and its deps resolve.
 
 `limits_runner.py` (`./run_limits`) is a separate interactive tool in this
 folder for the body-following experiment's next step
-(`../../coordination/archive/face_following_full_history.md`,
+(the project workstream history,
 "Simple live threshold measurement"). It runs corrected face tracking
 continuously with the body held at yaw 0 while the operator walks around, and
 records the head pose each time the operator presses Enter at a felt limit.
@@ -182,6 +236,6 @@ and assert it is reversible.
 
 This runner does not perform product face-following or body-following. Its
 original physical baseline and corrected seated retest are complete; their
-results are in `../../coordination/archive/research_and_test_results.md`
+results are in the project workstream history
 Sections 20–21. Keep it for a
 future focused measurement, not as a default step for body-following work.
